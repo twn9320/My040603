@@ -43,11 +43,22 @@ public class MainActivity extends AppCompatActivity {
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
                     conn.connect();
+                    int total = conn.getContentLength();
+                    int current = 0;
                     inputStream = conn.getInputStream();
 
                     int readSize = 0;
                     while ((readSize=inputStream.read(buffer)) != -1) {
                         os.write(buffer, 0, readSize);
+                        current += readSize;
+                        final int c = current;
+                        final int t=total;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                tv.setText(String.valueOf(100*c/t));
+                            }
+                        });
                     }
                     byte[] result = os.toByteArray();
                     final Bitmap bitmap = BitmapFactory.decodeByteArray(result,0,result.length);
